@@ -13,7 +13,7 @@ def get_service(request: Request) -> ActivityService:
 
 
 Service = Annotated[ActivityService, Depends(get_service)]
-ActivityId = Annotated[int, Path(ge=1)]
+ActivityId = Annotated[int, Path(ge=1, le=2**63 - 1)]
 Page = Annotated[int, Query(ge=1, le=1000000)]
 PageSize = Annotated[int, Query(ge=1, le=100)]
 

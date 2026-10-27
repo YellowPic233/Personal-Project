@@ -1,6 +1,7 @@
 """只适用于本机演示，不是公网身份认证机制。"""
 
 from ipaddress import ip_address
+import posixpath
 from urllib.parse import urlsplit
 
 from fastapi import Request
@@ -38,7 +39,10 @@ async def local_demo_guard(request: Request, call_next):
         return error_response(403, "UNTRUSTED_HOST", "仅允许使用本机地址访问。")
 
     path = request.scope["path"]
-    is_admin = path == "/api/admin" or path.startswith("/api/admin/") or path.rstrip("/") in {"/admin", "/static/admin.html"}
+    # Windows 文件名大小写不敏感；静态文件还会解析点路径和反斜杠。
+    # 访问判断按同样的路径语义归一化，防止替代写法绕过管理 HTML 的本机限制。
+    normalized_path = posixpath.normpath(path.replace("\\", "/")).casefold().split(":", 1)[0].rstrip("/ .")
+    is_admin = normalized_path == "/api/admin" or normalized_path.startswith("/api/admin/") or normalized_path in {"/admin", "/static/admin.html"}
     if is_admin:
         if not local_client(request) or any(header in request.headers for header in FORWARDED_HEADERS):
             return error_response(403, "ADMIN_LOCAL_ONLY", "管理接口仅允许本机直接访问。")
@@ -57,4 +61,7 @@ async def local_demo_guard(request: Request, call_next):
         # 原生模块无打包哈希：每次使用前重新验证，避免修改后继续展示旧脚本。
         response.headers["Cache-Control"] = "no-cache"
     response.headers["X-Content-Type-Options"] = "nosniff"
+    # 即使恶意网页不能读取同源数据，也不应允许其套用管理页面诱导点击。
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Content-Security-Policy"] = "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
     return response

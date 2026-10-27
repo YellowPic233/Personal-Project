@@ -16,6 +16,14 @@ class Category(str, Enum):
 class InputModel(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
 
+    @field_validator("*", mode="before")
+    @classmethod
+    def reject_null_characters(cls, value):
+        # SQLite length() 在 NUL 处截断，必须在进入数据库之前拒绝这类文本。
+        if isinstance(value, str) and "\x00" in value:
+            raise ValueError("文本不能包含空字符。")
+        return value
+
 
 class ActivityInput(InputModel):
     title: Annotated[str, Field(min_length=1, max_length=100)]
@@ -38,7 +46,10 @@ class ActivityInput(InputModel):
     @field_validator("starts_at", "ends_at", "registration_deadline")
     @classmethod
     def normalize_time(cls, value: datetime):
-        return value.astimezone(timezone.utc)
+        try:
+            return value.astimezone(timezone.utc)
+        except (OverflowError, ValueError) as exc:
+            raise ValueError("转换为 UTC 后的时间超出支持范围。") from exc
 
     @model_validator(mode="after")
     def validate_schedule(self):
