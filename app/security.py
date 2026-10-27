@@ -38,7 +38,7 @@ async def local_demo_guard(request: Request, call_next):
         return error_response(403, "UNTRUSTED_HOST", "仅允许使用本机地址访问。")
 
     path = request.scope["path"]
-    is_admin = path == "/api/admin" or path.startswith("/api/admin/") or path == "/admin"
+    is_admin = path == "/api/admin" or path.startswith("/api/admin/") or path.rstrip("/") in {"/admin", "/static/admin.html"}
     if is_admin:
         if not local_client(request) or any(header in request.headers for header in FORWARDED_HEADERS):
             return error_response(403, "ADMIN_LOCAL_ONLY", "管理接口仅允许本机直接访问。")
@@ -51,7 +51,10 @@ async def local_demo_guard(request: Request, call_next):
             return error_response(403, "UNTRUSTED_ORIGIN", "不允许跨站写入请求。")
 
     response = await call_next(request)
-    if path.startswith("/api/admin") or path.endswith("/registrations"):
+    if is_admin or path.endswith("/registrations"):
         response.headers["Cache-Control"] = "no-store"
+    elif path.startswith("/static/") or path == "/" or path.startswith("/activities/"):
+        # 原生模块无打包哈希：每次使用前重新验证，避免修改后继续展示旧脚本。
+        response.headers["Cache-Control"] = "no-cache"
     response.headers["X-Content-Type-Options"] = "nosniff"
     return response

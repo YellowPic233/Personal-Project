@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>活动详情 · 校园有约</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/styles.css?v=20261027">
+  <script type="module" src="/static/js/activity.js?v=20261027"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand" href="/" aria-label="校园有约首页"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 27V15M16 17C6 18 5 10 5 7c7-1 12 3 11 10Zm0 0C26 18 27 10 27 7c-7-1-12 3-11 10Z"/></svg></span>校园有约</a>
+    <nav aria-label="主导航"><a href="/" aria-current="page">活动广场</a><a href="/admin">管理后台</a></nav>
+  </div></header>
+  <main id="main" class="container detail-main">
+    <a class="back-link" href="/"><span data-icon="left" aria-hidden="true"></span>返回活动广场</a>
+    <div id="detail-state"><div class="state-panel" role="status"><span class="spinner" aria-hidden="true"></span><h2>正在加载活动详情</h2></div></div>
+    <div id="detail-layout" class="detail-layout" hidden>
+      <article class="detail-content panel">
+        <div class="badge-row"><span id="detail-category" class="category-tag"></span><span id="detail-status"></span></div>
+        <h1 id="detail-title"></h1>
+        <p class="club-line"><span data-icon="users" aria-hidden="true"></span><span class="muted">主办社团</span><strong id="detail-club"></strong></p>
+        <dl class="detail-facts">
+          <div><dt><span data-icon="calendar" aria-hidden="true"></span>活动时间</dt><dd id="detail-time"></dd></div>
+          <div><dt><span data-icon="pin" aria-hidden="true"></span>活动地点</dt><dd id="detail-location"></dd></div>
+          <div><dt><span data-icon="clock" aria-hidden="true"></span>报名截止</dt><dd id="detail-deadline"></dd></div>
+          <div><dt><span data-icon="users" aria-hidden="true"></span>活动名额</dt><dd id="detail-capacity"></dd></div>
+        </dl>
+        <section class="description-section"><h2>活动介绍</h2><p id="detail-description" class="description-text"></p></section>
+        <p class="time-note">页面时间均为北京时间（UTC+8）。</p>
+      </article>
+      <aside class="registration-panel panel" aria-labelledby="registration-title">
+        <div class="registration-heading"><h2 id="registration-title">报名参加</h2><p id="remaining-count" class="muted"></p></div>
+        <div id="registration-notice" class="notice" hidden></div>
+        <div id="registration-success" class="success-panel" tabindex="-1" hidden>
+          <span data-icon="check" class="success-icon" aria-hidden="true"></span><h3>报名成功！</h3><p id="success-message"></p><p class="muted">期待在活动现场见到你。</p><a class="button secondary" href="/">继续探索活动</a>
+        </div>
+        <form id="registration-form" novalidate>
+          <div id="registration-error" class="form-error" role="alert" tabindex="-1" hidden></div>
+          <fieldset id="registration-fields" class="form-fields">
+            <legend class="sr-only">填写报名信息</legend>
+            <div class="field"><label for="name">姓名 <span class="required" aria-hidden="true">*</span></label><input id="name" name="name" maxlength="50" required placeholder="请输入姓名" autocomplete="name" aria-describedby="name-error"><small id="name-error" class="field-error" data-error-field="name" hidden></small></div>
+            <div class="field"><label for="student_id">学号 <span class="required" aria-hidden="true">*</span></label><input id="student_id" name="student_id" maxlength="32" pattern="[A-Za-z0-9_\-]+" required placeholder="请输入学号" autocomplete="off" aria-describedby="student-hint student_id-error"><small id="student-hint" class="field-hint">支持字母、数字、下划线和连字符。</small><small id="student_id-error" class="field-error" data-error-field="student_id" hidden></small></div>
+            <div class="field"><label for="contact">联系方式 <span class="required" aria-hidden="true">*</span></label><input id="contact" name="contact" maxlength="100" required placeholder="请输入联系方式" autocomplete="off" aria-describedby="contact-hint contact-error"><small id="contact-hint" class="field-hint">邮箱、电话或其他常用联系方式。</small><small id="contact-error" class="field-error" data-error-field="contact" hidden></small></div>
+            <button id="registration-submit" type="submit" class="button primary full-width">提交报名</button>
+          </fieldset>
+          <p class="form-note"><span data-icon="info" aria-hidden="true"></span>每个学号限报名一次，带 * 的字段为必填项。</p>
+        </form>
+      </aside>
+    </div>
+  </main>
+  <footer class="site-footer container">校园有约 · 让每一份热爱都有回响。</footer>
+  <div id="toasts" class="toast-region" aria-live="polite"></div>
+  <noscript><div class="noscript">请启用 JavaScript，以查看活动详情和报名。</div></noscript>
+</body>
+</html>

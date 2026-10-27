@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .db import Database
@@ -36,10 +37,18 @@ def create_app(database_path: str | Path | None = None, *, static_dir: str | Pat
 
     @app.get("/", include_in_schema=False)
     def root():
-        return {"message": "后端 API 已就绪；本阶段未开发前端。", "docs": "/docs", "health": "/api/health"}
+        return FileResponse(STATIC_DIR / "index.html")
+
+    @app.get("/activities/{activity_id}", include_in_schema=False)
+    def activity_page(activity_id: int):
+        return FileResponse(STATIC_DIR / "activity.html")
+
+    @app.get("/admin", include_in_schema=False)
+    def admin_page():
+        return FileResponse(STATIC_DIR / "admin.html")
 
     # 只挂载专用资源目录，不把项目根目录或 SQLite 文件暴露为静态文件。
-    # 本阶段目录为空；后续 HTML/CSS/JS 可通过 /static/... 访问。
+    # HTML 页面和资源均与 API 同源，不依赖前端构建工具或外部 CDN。
     app.mount("/static", StaticFiles(directory=static_dir or STATIC_DIR), name="static")
     return app
 
